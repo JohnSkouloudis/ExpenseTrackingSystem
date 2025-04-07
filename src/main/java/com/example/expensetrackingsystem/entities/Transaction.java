@@ -2,9 +2,11 @@ package com.example.expensetrackingsystem.entities;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDate;
 
+@Data
 @Entity
 @Table(name = "transactions")
 public class Transaction {

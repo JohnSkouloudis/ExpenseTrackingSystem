@@ -2,7 +2,9 @@ package com.example.expensetrackingsystem.entities;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 public class Account {
 

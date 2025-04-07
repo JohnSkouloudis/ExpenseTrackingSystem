@@ -1,7 +1,9 @@
 package com.example.expensetrackingsystem.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -15,4 +17,6 @@ public class Category {
     @ManyToOne
     @JoinColumn(name = "parentCategory_id")
     private Category parentCategory;
+
+
 }
