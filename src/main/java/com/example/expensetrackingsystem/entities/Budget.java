@@ -1,9 +1,6 @@
 package com.example.expensetrackingsystem.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -12,14 +9,19 @@ import java.time.LocalDate;
 @Entity
 public class Budget {
 
+    @Id
+    private Long id;
+
     private float budgetAmount;
+
+    private float remainingAmount;
 
     private LocalDate startDate;
 
     private LocalDate endDate;
 
-    @Id
+
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @PrimaryKeyJoinColumn(name = "user_id")
     private User user;
 }
