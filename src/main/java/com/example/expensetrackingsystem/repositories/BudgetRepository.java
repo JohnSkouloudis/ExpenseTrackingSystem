@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BudgetRepository extends JpaRepository<Budget, Integer> {
 
-    Budget findByUser(User user);
+    Budget findByUserId(int userId);
 }

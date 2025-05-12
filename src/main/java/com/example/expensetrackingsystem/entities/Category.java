@@ -1,5 +1,6 @@
 package com.example.expensetrackingsystem.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class Category {
 
     private String categoryName;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "parentCategory_id")
     private Category parentCategory;
