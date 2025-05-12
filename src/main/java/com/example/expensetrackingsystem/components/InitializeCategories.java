@@ -1,4 +1,4 @@
-package com.example.expensetrackingsystem.services;
+package com.example.expensetrackingsystem.components;
 
 import com.example.expensetrackingsystem.entities.Category;
 import com.example.expensetrackingsystem.entities.CategoryEnum;
@@ -10,17 +10,17 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class InitializeCategoriesService implements CommandLineRunner {
+public class InitializeCategories implements CommandLineRunner {
 
     CategoryRepository categoryRepository;
 
     @Autowired
-    public InitializeCategoriesService(CategoryRepository categoryRepository) {
+    public InitializeCategories(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args)  {
 
         if(categoryRepository.count() == 0) {
 

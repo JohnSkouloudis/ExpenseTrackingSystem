@@ -30,6 +30,21 @@ public enum CategoryEnum {
         return parent;
     }
 
+    public static  boolean isCategoryExpense(int categoryId) {
+
+       CategoryEnum current =  CategoryEnum.values()[categoryId];
+
+       while (current != null) {
+
+         if (current == EXPENSE) {
+            return true;
+        }
+         current = current.getParent();
+       }
+       return false;
+
+  }
+
 
 
 }
