@@ -1,8 +1,10 @@
 package com.example.expensetrackingsystem.services;
 
+import com.example.expensetrackingsystem.dto.TransactionDTO;
 import com.example.expensetrackingsystem.entities.Account;
 import com.example.expensetrackingsystem.entities.Category;
 import com.example.expensetrackingsystem.entities.Transaction;
+import com.example.expensetrackingsystem.repositories.AccountRepository;
 import com.example.expensetrackingsystem.repositories.CategoryRepository;
 import com.example.expensetrackingsystem.repositories.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -21,30 +23,53 @@ public class TransactionService {
 
     private final CategoryRepository categoryRepository;
 
+    private final AccountRepository accountRepository;
+
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository, CategoryRepository categoryRepository) {
+    public TransactionService(TransactionRepository transactionRepository, CategoryRepository categoryRepository,
+                              AccountRepository accountRepository ) {
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
+        this.accountRepository = accountRepository;
     }
 
     // Save a transaction
     @Transactional
-    public void saveTransaction(Transaction transaction) {
+    public void saveTransaction(TransactionDTO transactiondto) {
+
+        Category category = categoryRepository.findByCategoryName(transactiondto.categoryName().toUpperCase())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+        Account account = accountRepository.findById(transactiondto.accountId()).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+
+        Transaction transaction = new Transaction();
+         transaction.setCategory(category);
+         transaction.setAccount(account);
+         transaction.setAmount(transactiondto.amount());
+         transaction.setDescription(transactiondto.description());
+         transaction.setDate(transactiondto.date());
+
         transactionRepository.save(transaction);
     }
 
     // Get a page of transactions for a specific account
     @Transactional
-    public Page<Transaction> getAccountTransactions(int accountId, Pageable pageable) {
+    public Page<TransactionDTO> getAccountTransactions(int accountId, Pageable pageable) {
 
-        return transactionRepository.findByAccountId(accountId, pageable);
+          Page<Transaction> transactions= transactionRepository.findByAccountId(accountId, pageable);
+
+           return  transactions.map(this::toDto);
     }
 
     // Get a list of transactions for a specific account
     @Transactional
-    public List<Transaction> getAccountTransactions(int accountId) {
+    public List<TransactionDTO> getAccountTransactions(int accountId) {
 
-        return transactionRepository.findByAccountId(accountId);
+        List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+
+        return transactions.stream()
+                .map(this::toDto)
+                .toList();
     }
 
     //Get a list  of transactions for a specific category
@@ -66,6 +91,21 @@ public class TransactionService {
     @Transactional
     public void  deleteTransaction(Transaction transaction) {
         transactionRepository.delete(transaction);
+    }
+
+
+    // turn Transaction to TransactionDTO
+    public TransactionDTO toDto(Transaction transaction) {
+        return new TransactionDTO(
+                transaction.getId(),
+                transaction.getAmount(),
+                transaction.getDescription(),
+                transaction.getDate(),
+                transaction.getAccount().getId(),
+                transaction.getCategory().getCategoryName()
+        );
+
+
     }
 
 }
