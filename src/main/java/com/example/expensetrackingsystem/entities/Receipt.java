@@ -10,7 +10,7 @@ import lombok.Data;
 @Entity
 public class Receipt {
 
-    private String imagePath;
+    private String imageName;
 
     @Id
     @OneToOne
