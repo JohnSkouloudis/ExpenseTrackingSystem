@@ -1,6 +1,7 @@
 package com.example.expensetrackingsystem.controllers;
 
 import com.example.expensetrackingsystem.dto.TransactionDTO;
+import com.example.expensetrackingsystem.services.ImageService;
 import com.example.expensetrackingsystem.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
+
+    @Autowired
+    private ImageService imageService;
 
     @Autowired
     private TransactionService transactionService;
@@ -39,6 +43,17 @@ public class TransactionController {
     public ResponseEntity<String> createTransaction( @RequestBody TransactionDTO transactiondto) {
         transactionService.saveTransaction(transactiondto);
         return ResponseEntity.ok("Transaction created successfully");
+    }
+
+
+    @PostMapping("/create-bucket")
+    public ResponseEntity<String> createBucket(@RequestParam String name) {
+        try {
+            imageService.createBucket(name);
+            return ResponseEntity.ok("Bucket created: " + name);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
     }
 
 }

@@ -73,12 +73,18 @@ public class TransactionService {
     }
 
     //Get a list  of transactions for a specific category
+    // TODO: implement this unfinished method
     @Transactional
-    public List<Transaction> getTransactionsByCategory(String categoryName) {
+    public List<Transaction> getTransactionsByCategory(String categoryName, int accountId) {
+
+        // Find the account by ID
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
         Optional<Category> category = categoryRepository.findByCategoryName(categoryName.toUpperCase());
 
         if (category.isPresent()) {
+
             return transactionRepository.findByCategory(category.get());
         }else{
             return null;
@@ -88,6 +94,7 @@ public class TransactionService {
     }
 
  // delete a transaction
+  // TODO: implement this unfinished method
     @Transactional
     public void  deleteTransaction(Transaction transaction) {
         transactionRepository.delete(transaction);
