@@ -15,4 +15,9 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     Page<Account> findByUser(User user, Pageable pageable);
     List<Account> findByUser(User user);
+
+    Page<Account> findByUserId(int userId, Pageable pageable);
+    List<Account> findByUserId(int userId);
+
+    List<Account> user(User user);
 }
