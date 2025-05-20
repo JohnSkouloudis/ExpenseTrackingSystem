@@ -40,7 +40,7 @@ public class ImageService {
         }
     }
 
-    public void uploadImage(String bucketName, String imageName, MultipartFile file)  {
+    public void uploadImage(String bucketName, MultipartFile file)  {
 
         try {
 
@@ -52,7 +52,7 @@ public class ImageService {
                 minioClient.putObject(
                         PutObjectArgs.builder()
                                 .bucket(bucketName)
-                                .object(imageName)
+                                .object(file.getOriginalFilename())
                                 .stream(file.getInputStream(), file.getSize(), -1)
                                 .contentType(file.getContentType())
                                 .build()
