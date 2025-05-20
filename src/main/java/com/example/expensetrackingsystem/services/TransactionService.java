@@ -7,6 +7,9 @@ import com.example.expensetrackingsystem.entities.Transaction;
 import com.example.expensetrackingsystem.repositories.AccountRepository;
 import com.example.expensetrackingsystem.repositories.CategoryRepository;
 import com.example.expensetrackingsystem.repositories.TransactionRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,7 +38,7 @@ public class TransactionService {
 
     // Save a transaction
     @Transactional
-    public void saveTransaction(TransactionDTO transactiondto) {
+    public Transaction saveTransaction(TransactionDTO transactiondto) {
 
         Category category = categoryRepository.findByCategoryName(transactiondto.categoryName().toUpperCase())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
@@ -49,7 +52,9 @@ public class TransactionService {
          transaction.setDescription(transactiondto.description());
          transaction.setDate(transactiondto.date());
 
-        transactionRepository.save(transaction);
+        Transaction save = transactionRepository.save(transaction);
+
+        return save;
     }
 
     // Get a page of transactions for a specific account
@@ -113,6 +118,12 @@ public class TransactionService {
         );
 
 
+    }
+
+    public TransactionDTO convertToTransactionDto(String transactiDtoString) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper.readValue(transactiDtoString, TransactionDTO.class);
     }
 
 }
