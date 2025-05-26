@@ -38,7 +38,7 @@ public class ReceiptService {
     }
 
     @Transactional
-    public String getImageName(int TransactionId) {
+    public String getReceiptImageName(int TransactionId) {
         Receipt receipt = receiptRepository.findByTransactionId(TransactionId);
 
         if (receipt != null) {

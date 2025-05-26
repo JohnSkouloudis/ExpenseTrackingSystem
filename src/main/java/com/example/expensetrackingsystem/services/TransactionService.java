@@ -98,6 +98,13 @@ public class TransactionService {
 
     }
 
+    public TransactionDTO getTransactionDetails(int transactionId){
+
+            Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+
+            return toDto(transaction);
+    }
+
  // delete a transaction
   // TODO: implement this unfinished method
     @Transactional

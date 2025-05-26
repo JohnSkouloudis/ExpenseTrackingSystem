@@ -1,6 +1,7 @@
 package com.example.expensetrackingsystem.controllers;
 
 import com.example.expensetrackingsystem.dto.TransactionDTO;
+import com.example.expensetrackingsystem.dto.TransactionDetails;
 import com.example.expensetrackingsystem.entities.Transaction;
 import com.example.expensetrackingsystem.services.ImageService;
 import com.example.expensetrackingsystem.services.ReceiptService;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 
 
@@ -66,6 +69,33 @@ public class TransactionController {
         return ResponseEntity.ok("Transaction created successfully");
     }
 
+
+
+
+    @GetMapping("/details/{transactionId}")
+    public ResponseEntity<TransactionDetails> getTransactionDetails(@PathVariable int transactionId) {
+
+        TransactionDTO transactiondto = transactionService.getTransactionDetails(transactionId);
+        String imageName = receiptService.getReceiptImageName(transactionId);
+        String base64Image = null;
+
+        if (imageName != null) {
+
+            try {
+                InputStream imageStream = imageService.getImage("john", imageName);
+                byte[] imageData = imageStream.readAllBytes();
+                base64Image = Base64.getEncoder().encodeToString(imageData);
+
+            } catch (Exception e) {
+                throw new RuntimeException("Error reading image: " + e.getMessage(), e);
+            }
+
+
+        }
+        TransactionDetails  response= new TransactionDetails(transactiondto, base64Image);
+
+        return ResponseEntity.ok(response);
+    }
 
 
 

@@ -1,13 +1,12 @@
 package com.example.expensetrackingsystem.services;
 
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.InputStream;
 
 @Service
 public class ImageService {
@@ -68,6 +67,19 @@ public class ImageService {
         }
 
 
+    }
+
+    public InputStream getImage(String bucketName, String imageName) {
+        try {
+            return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(imageName)
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving image: " + e.getMessage(), e);
+        }
     }
 
 }
