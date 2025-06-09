@@ -3,9 +3,7 @@ package com.example.expensetrackingsystem.controllers;
 import com.example.expensetrackingsystem.dto.TransactionDTO;
 import com.example.expensetrackingsystem.dto.TransactionDetails;
 import com.example.expensetrackingsystem.entities.Transaction;
-import com.example.expensetrackingsystem.services.ImageService;
-import com.example.expensetrackingsystem.services.ReceiptService;
-import com.example.expensetrackingsystem.services.TransactionService;
+import com.example.expensetrackingsystem.services.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,16 +32,43 @@ public class TransactionController {
     @Autowired
     private ReceiptService receiptService;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private AccountService accountService;
+
     // Endpoint to get transactions for a specific account
     @GetMapping("/{accountId}")
-    public ResponseEntity<List<TransactionDTO>> getAccountTransactions(@PathVariable int accountId) {
+    public ResponseEntity<?> getAccountTransactions(@PathVariable int accountId,@RequestHeader(value = "Authorization",required = false) String authHeader) {
+
+        String token = authHeader.substring(7);
+
+        int userId = jwtService.extractUserId(token);
+
+        if( accountService.findByIdAndUser( accountId,userId) == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
+        }
+
+
         List<TransactionDTO> transactions = transactionService.getAccountTransactions(accountId);
         return ResponseEntity.ok(transactions);
     }
 
     // Endpoint to get paginated transactions for a specific account
     @GetMapping("/{accountId}/{page}")
-    public ResponseEntity<Page<TransactionDTO>> getPagedAccountTransactions(@PathVariable int accountId, @PathVariable int page, @RequestParam int size) {
+    public ResponseEntity<?> getPagedAccountTransactions(@PathVariable int accountId,
+                                                                            @PathVariable int page,
+                                                                            @RequestParam int size,
+                                                                            @RequestHeader(value = "Authorization",required = false) String authHeader) {
+        String token = authHeader.substring(7);
+
+        int userId = jwtService.extractUserId(token);
+
+        if( accountService.findByIdAndUser( accountId,userId) == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
+        }
+
         Page<TransactionDTO> transactions = transactionService.getAccountTransactions(accountId, PageRequest.of(page, size));
         return ResponseEntity.ok(transactions);
     }
@@ -54,16 +79,29 @@ public class TransactionController {
     @PostMapping(value = "/add" , consumes = {MediaType.MULTIPART_FORM_DATA_VALUE} )
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createTransaction(@RequestPart("data")String transactionDto,
-                                                    @RequestPart(value = "image", required = false) MultipartFile image) throws JsonProcessingException {
+                                                    @RequestPart(value = "image", required = false) MultipartFile image,
+                                                    @RequestHeader(value = "Authorization",required = false) String authHeader) throws JsonProcessingException {
+
+        String token = authHeader.substring(7);
+
+        if(!jwtService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+       String username = jwtService.extractUsername(token);
 
 
         TransactionDTO dto = transactionService.convertToTransactionDto(transactionDto);
 
+        if(accountService.findByIdAndUser(dto.accountId(),jwtService.extractUserId(token)) == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
+        }
+
         Transaction transaction = transactionService.saveTransaction(dto);
 
-        if (!image.isEmpty()) {
+        if (image != null) {
             receiptService.saveReceipt(transaction, image.getOriginalFilename());
-            imageService.uploadImage("john", image);
+            imageService.uploadImage(username, image);
 
         }
         return ResponseEntity.ok("Transaction created successfully");
@@ -73,9 +111,23 @@ public class TransactionController {
 
 
     @GetMapping("/details/{transactionId}")
-    public ResponseEntity<TransactionDetails> getTransactionDetails(@PathVariable int transactionId) {
+    public ResponseEntity<?> getTransactionDetails(@PathVariable int transactionId,
+                                                                    @RequestHeader (value = "Authorization",required =false) String authHeader ) {
+
+        String token = authHeader.substring(7);
+
+        if(!jwtService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        int userId = jwtService.extractUserId(token);
 
         TransactionDTO transactiondto = transactionService.getTransactionDetails(transactionId);
+
+        if( accountService.findByIdAndUser(transactiondto.accountId(),userId) == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
+        }
+
         String imageName = receiptService.getReceiptImageName(transactionId);
         String base64Image = null;
 
