@@ -77,6 +77,11 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+    public Account findByIdAndUser(int accountId, int userId) {
+        return accountRepository.findByIdAndUserId(accountId, userId)
+                .orElse(null);
+    }
+
     public AccountDTO toDto(Account account) {
         return new AccountDTO(
                 account.getId(),
@@ -88,6 +93,8 @@ public class AccountService {
 
 
     }
+
+
 
 
 

@@ -1,6 +1,7 @@
 package com.example.expensetrackingsystem.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,8 @@ public class Account {
 
  private String accountName;
 
+
+@JsonIgnore
 @ManyToOne
 @JoinColumn(name = "user_id",nullable = false)
  private User user;
