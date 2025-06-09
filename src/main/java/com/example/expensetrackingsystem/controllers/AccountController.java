@@ -20,7 +20,7 @@ public class AccountController {
 
     // Endpoint to get transactions for a specific account
     @GetMapping("/{userId}")
-    public ResponseEntity<List<AccountDTO>> getUserAccounts(@PathVariable int userId) {
+    public ResponseEntity<List<AccountDTO>> getUserAccounts(@PathVariable int userId,@RequestHeader(value = "Authorization", required = false) String authHeader) {
         List<AccountDTO> accounts = accountService.getAccountsByUser(userId);
         return ResponseEntity.ok(accounts);
     }
@@ -39,6 +39,7 @@ public class AccountController {
         accountService.saveAccount(accountdto);
         return ResponseEntity.ok("Account created successfully");
     }
+
 
     // TODO: implement update account
 
