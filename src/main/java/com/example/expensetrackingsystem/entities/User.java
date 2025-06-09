@@ -1,5 +1,6 @@
 package com.example.expensetrackingsystem.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user",orphanRemoval = true)
     private List<Account> accounts;
 }
