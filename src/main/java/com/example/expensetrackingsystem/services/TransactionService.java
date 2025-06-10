@@ -1,5 +1,6 @@
 package com.example.expensetrackingsystem.services;
 
+import com.example.expensetrackingsystem.dto.AccountDTO;
 import com.example.expensetrackingsystem.dto.TransactionDTO;
 import com.example.expensetrackingsystem.entities.Account;
 import com.example.expensetrackingsystem.entities.Category;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,12 +108,6 @@ public class TransactionService {
             return toDto(transaction);
     }
 
- // delete a transaction
-  // TODO: implement this unfinished method
-    @Transactional
-    public void  deleteTransaction(Transaction transaction) {
-        transactionRepository.delete(transaction);
-    }
 
 
     // turn Transaction to TransactionDTO
@@ -124,6 +121,22 @@ public class TransactionService {
                 transaction.getCategory().getCategoryName()
         );
 
+
+    }
+
+    public List<TransactionDTO> findByDateBetween(LocalDate from, LocalDate to, List<AccountDTO> accounts){
+
+        List<TransactionDTO> results = new ArrayList<>();
+
+        for(AccountDTO account : accounts){
+            List<Transaction> transactions = transactionRepository.findByAccountIdAndDateBetween(account.getId(),from, to );
+
+            for(Transaction transaction : transactions){
+                results.add(toDto(transaction));
+            }
+
+        }
+        return results;
 
     }
 
