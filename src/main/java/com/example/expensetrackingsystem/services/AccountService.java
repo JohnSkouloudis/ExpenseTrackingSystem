@@ -32,12 +32,12 @@ public class AccountService {
     public void saveAccount(AccountDTO accountdto) {
 
 
-        User user = userRepository.findById(accountdto.userId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findById(accountdto.getUserId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Account account = new Account();
         account.setUser(user);
-        account.setAccountName(accountdto.accountName());
-        account.setBalance(accountdto.balance());
+        account.setAccountName(accountdto.getAccountName());
+        account.setBalance(accountdto.getBalance());
 
         accountRepository.save(account);
     }
@@ -71,8 +71,8 @@ public class AccountService {
     public void updateAccount(int accountId, AccountDTO accountdto) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
-        account.setAccountName(accountdto.accountName());
-        account.setBalance(accountdto.balance());
+        account.setAccountName(accountdto.getAccountName());
+        account.setBalance(accountdto.getBalance());
 
         accountRepository.save(account);
     }
