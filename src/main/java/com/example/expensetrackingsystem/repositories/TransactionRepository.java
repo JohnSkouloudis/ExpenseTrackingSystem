@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -21,6 +22,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     List<Transaction> findByAccountId(int accountId);
     Page<Transaction> findByAccountId(int accountId, Pageable pageable);
 
+    List<Transaction> findByAccountIdAndDateBetween(int accountId, LocalDate from, LocalDate to);
 
 
 }
