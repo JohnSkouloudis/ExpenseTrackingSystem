@@ -1,20 +1,32 @@
 package com.example.expensetrackingsystem.controllers;
 
+import com.example.expensetrackingsystem.dto.AccountDTO;
 import com.example.expensetrackingsystem.dto.TransactionDTO;
 import com.example.expensetrackingsystem.dto.TransactionDetails;
+import com.example.expensetrackingsystem.entities.Account;
 import com.example.expensetrackingsystem.entities.Transaction;
 import com.example.expensetrackingsystem.services.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
 
@@ -148,6 +160,32 @@ public class TransactionController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("exportToCsv")
+    public void ExportTransactionsToCsv(HttpServletResponse response ,
+                                        @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                        @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate ,
+                                        @RequestHeader(value = "Authorization",required =false) String authHeader) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
+
+        String token = authHeader.substring(7);
+        int userId = jwtService.extractUserId(token);
+
+        List<AccountDTO> accounts = accountService.getAccountsByUser(userId);
+
+
+        String csvFileName = "transactions.csv";
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + csvFileName + "");
+
+        StatefulBeanToCsv<TransactionDTO> writer = new StatefulBeanToCsvBuilder<TransactionDTO>(response.getWriter())
+                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                .withOrderedResults(true)
+                .build();
+
+        writer.write(transactionService.findByDateBetween(startDate, endDate, accounts));
+
+    }
+
 
 
 
