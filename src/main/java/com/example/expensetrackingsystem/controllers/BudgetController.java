@@ -1,6 +1,7 @@
 package com.example.expensetrackingsystem.controllers;
 
 import com.example.expensetrackingsystem.dto.BudgetDTO;
+import com.example.expensetrackingsystem.entities.Budget;
 import com.example.expensetrackingsystem.services.BudgetService;
 import com.example.expensetrackingsystem.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,19 @@ public class BudgetController {
         budgetService.deleteBudgetByUserId(userId);
         return ResponseEntity.ok("Budget deleted successfully");
 
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<?> getBudget(@RequestHeader(value = "Authorization",required =false) String header) {
+        String token = header.substring(7);
+        int userId = jwtService.extractUserId(token);
+
+        if(budgetService.getBudgetByUserId(userId) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Budget not found for this user");
+        }
+
+        Budget budget = budgetService.getBudgetByUserId(userId);
+        return ResponseEntity.ok(budget);
     }
 
 }

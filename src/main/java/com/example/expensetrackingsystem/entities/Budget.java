@@ -1,5 +1,6 @@
 package com.example.expensetrackingsystem.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,7 +22,7 @@ public class Budget {
 
     private LocalDate endDate;
 
-
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
