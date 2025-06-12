@@ -44,7 +44,7 @@ public class AccountController {
     public ResponseEntity<?> getPagedUserAccounts(@PathVariable int userId,
                                                                  @PathVariable int page,
                                                                  @RequestParam int size,
-                                                                 @RequestHeader String authHeader) {
+                                                                 @RequestHeader (value = "Authorization",required =false) String authHeader) {
 
         String token = authHeader.substring(7);
 
@@ -61,7 +61,7 @@ public class AccountController {
     // Endpoint to create a transaction for an account
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> createAccount( @RequestBody AccountDTO accountdto,@RequestHeader String authHeader) {
+    public ResponseEntity<String> createAccount( @RequestBody AccountDTO accountdto,@RequestHeader (value = "Authorization",required =false) String authHeader) {
 
         String token = authHeader.substring(7);
         int userId = jwtService.extractUserId(token);
