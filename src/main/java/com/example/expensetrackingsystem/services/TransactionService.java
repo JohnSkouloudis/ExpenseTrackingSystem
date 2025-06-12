@@ -1,5 +1,6 @@
 package com.example.expensetrackingsystem.services;
 
+import com.example.expensetrackingsystem.components.TransactionCreationEvent;
 import com.example.expensetrackingsystem.dto.AccountDTO;
 import com.example.expensetrackingsystem.dto.TransactionDTO;
 import com.example.expensetrackingsystem.entities.Account;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,12 +33,15 @@ public class TransactionService {
 
     private final AccountRepository accountRepository;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Autowired
     public TransactionService(TransactionRepository transactionRepository, CategoryRepository categoryRepository,
-                              AccountRepository accountRepository ) {
+                              AccountRepository accountRepository,ApplicationEventPublisher eventPublisher ) {
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
         this.accountRepository = accountRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     // Save a transaction
@@ -56,6 +61,8 @@ public class TransactionService {
          transaction.setDate(transactiondto.date());
 
         Transaction save = transactionRepository.save(transaction);
+
+        eventPublisher.publishEvent(new TransactionCreationEvent(this,save,account.getUser().getId()) );
 
         return save;
     }
