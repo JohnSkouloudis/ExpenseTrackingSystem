@@ -26,6 +26,13 @@ public class BudgetService {
     }
 
     @Transactional
+    public void updateBudgetRemainingAmount(Budget budget, float subtractedAmount){
+
+        budget.setRemainingAmount(budget.getRemainingAmount() - subtractedAmount);
+        budgetRepository.save(budget);
+    }
+
+    @Transactional
     public void createBudget(BudgetDTO dto , int userId) {
 
         User user = userRepository.findById(userId)
