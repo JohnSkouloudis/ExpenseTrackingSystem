@@ -11,6 +11,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 public class BudgetService {
 
@@ -26,9 +29,9 @@ public class BudgetService {
     }
 
     @Transactional
-    public void updateBudgetRemainingAmount(Budget budget, float subtractedAmount){
+    public void updateBudgetRemainingAmount(Budget budget, float newRemainingAmount){
 
-        budget.setRemainingAmount(budget.getRemainingAmount() - subtractedAmount);
+        budget.setRemainingAmount(newRemainingAmount);
         budgetRepository.save(budget);
     }
 
@@ -91,6 +94,14 @@ public class BudgetService {
         if (budget != null) {
             budgetRepository.delete(budget);
         }
+    }
+
+    public List<Budget> getBudgetsByEndDate(LocalDate endDate) {
+
+        if (endDate == null) {
+            throw new IllegalArgumentException("End date cannot be null");
+        }
+        return budgetRepository.findByEndDate(endDate);
     }
 
 }

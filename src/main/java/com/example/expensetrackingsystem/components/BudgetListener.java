@@ -22,7 +22,8 @@ public class BudgetListener {
 
         if( budget != null &&  CategoryEnum.isCategoryExpense(categoryId) ) {
 
-            budgetService.updateBudgetRemainingAmount( budget, event.getTransaction().getAmount());
+            float newRemainingAmount = budget.getRemainingAmount() - event.getTransaction().getAmount();
+            budgetService.updateBudgetRemainingAmount( budget, newRemainingAmount);
 
         }
 
