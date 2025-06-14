@@ -1,7 +1,6 @@
 package com.example.expensetrackingsystem.components;
 
 import com.example.expensetrackingsystem.entities.Transaction;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
