@@ -3,6 +3,7 @@ package com.example.expensetrackingsystem.controllers;
 import com.example.expensetrackingsystem.dto.AccountDTO;
 import com.example.expensetrackingsystem.dto.TransactionDTO;
 import com.example.expensetrackingsystem.dto.TransactionDetails;
+import com.example.expensetrackingsystem.dto.CategorySummaryDTO;
 import com.example.expensetrackingsystem.entities.Transaction;
 import com.example.expensetrackingsystem.services.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,6 +49,9 @@ public class TransactionController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     // Endpoint to get transactions for a specific account
     @GetMapping("/{accountId}")
@@ -182,6 +186,23 @@ public class TransactionController {
                 .build();
 
         writer.write(transactionService.findByDateBetween(startDate, endDate, accounts));
+
+    }
+    @GetMapping("/Summary")
+    public List<CategorySummaryDTO> getTransactionSummary(@RequestHeader(value = "Authorization",required =false) String authHeader){
+        String token = authHeader.substring(7);
+        int userId = jwtService.extractUserId(token);
+
+        if(!jwtService.isTokenValid(token)) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+
+        return categoryService.getCategorySummaries(userId);
+
+
+
+
+
 
     }
 

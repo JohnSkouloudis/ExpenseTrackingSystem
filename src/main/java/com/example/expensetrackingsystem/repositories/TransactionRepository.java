@@ -24,5 +24,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
     List<Transaction> findByAccountIdAndDateBetween(int accountId, LocalDate from, LocalDate to);
 
+    long countByCategoryAndAccountIn(Category category, List<Account> accounts);
+
+
 
 }
