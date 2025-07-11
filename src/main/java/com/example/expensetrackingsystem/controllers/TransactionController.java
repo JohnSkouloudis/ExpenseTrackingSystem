@@ -136,7 +136,7 @@ public class TransactionController {
         }
 
         int userId = jwtService.extractUserId(token);
-
+        String username = jwtService.extractUsername(token);
         TransactionDTO transactiondto = transactionService.getTransactionDetails(transactionId);
 
         if( accountService.findByIdAndUser(transactiondto.accountId(),userId) == null) {
@@ -149,7 +149,7 @@ public class TransactionController {
         if (imageName != null) {
 
             try {
-                InputStream imageStream = imageService.getImage("john", imageName);
+                InputStream imageStream = imageService.getImage(username, imageName);
                 byte[] imageData = imageStream.readAllBytes();
                 base64Image = Base64.getEncoder().encodeToString(imageData);
 
@@ -188,7 +188,7 @@ public class TransactionController {
         writer.write(transactionService.findByDateBetween(startDate, endDate, accounts));
 
     }
-    @GetMapping("/Summary")
+    @GetMapping("/summary")
     public List<CategorySummaryDTO> getTransactionSummary(@RequestHeader(value = "Authorization",required =false) String authHeader){
         String token = authHeader.substring(7);
         int userId = jwtService.extractUserId(token);
