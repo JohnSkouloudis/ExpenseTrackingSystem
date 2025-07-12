@@ -51,6 +51,13 @@ public class AccountService {
     }
 
     @Transactional
+    public AccountDTO getAccountById(int id) {
+        Account account = accountRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+
+        return toDto(account);
+    }
+
+    @Transactional
     public List<AccountDTO> getAccountsByUser(int userId) {
 
         List<Account> accounts= accountRepository.findByUserId(userId);

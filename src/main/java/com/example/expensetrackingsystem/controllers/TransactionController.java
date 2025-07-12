@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,9 @@ public class TransactionController {
 
     // Endpoint to get transactions for a specific account
     @GetMapping("/{accountId}")
-    public ResponseEntity<?> getAccountTransactions(@PathVariable int accountId,@RequestHeader(value = "Authorization",required = false) String authHeader) {
+    public ResponseEntity<?> getAccountTransactions(@PathVariable int accountId,@RequestHeader(value = "Authorization",required = false) String authHeader,
+                                                    @RequestParam(value = "startDate",required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                    @RequestParam(value = "endDate",required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
         String token = authHeader.substring(7);
 
@@ -63,6 +66,13 @@ public class TransactionController {
 
         if( accountService.findByIdAndUser( accountId,userId) == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
+        }
+
+        if (startDate!= null && endDate != null) {
+            AccountDTO account = accountService.getAccountById(accountId);
+            List<AccountDTO> accounts = List.of(account);
+            List<TransactionDTO> transactions = transactionService.findByDateBetween(startDate, endDate,accounts );
+            return ResponseEntity.ok(transactions);
         }
 
 
@@ -75,6 +85,7 @@ public class TransactionController {
     public ResponseEntity<?> getPagedAccountTransactions(@PathVariable int accountId,
                                                                             @PathVariable int page,
                                                                             @RequestParam int size,
+                                                                            @RequestParam(required = false,defaultValue = "false")  boolean sortByDate,
                                                                             @RequestHeader(value = "Authorization",required = false) String authHeader) {
         String token = authHeader.substring(7);
 
@@ -84,13 +95,19 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
         }
 
-        Page<TransactionDTO> transactions = transactionService.getAccountTransactions(accountId, PageRequest.of(page, size));
+        Page<TransactionDTO> transactions;
+
+        if(sortByDate){
+             transactions = transactionService.getAccountTransactions(accountId, PageRequest.of(page, size, Sort.by("date").descending()));
+        }else {
+             transactions = transactionService.getAccountTransactions(accountId, PageRequest.of(page, size));
+        }
         return ResponseEntity.ok(transactions);
     }
 
 
 
-    // Endpoint to create a transaction for an account
+
     @PostMapping(value = "/add" , consumes = {MediaType.MULTIPART_FORM_DATA_VALUE} )
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createTransaction(@RequestPart("data")String transactionDto,
@@ -200,11 +217,8 @@ public class TransactionController {
         return categoryService.getCategorySummaries(userId);
 
 
-
-
-
-
     }
+
 
 
 
