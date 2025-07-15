@@ -6,6 +6,7 @@ import com.example.expensetrackingsystem.entities.Account;
 import com.example.expensetrackingsystem.entities.Transaction;
 import com.example.expensetrackingsystem.entities.User;
 import com.example.expensetrackingsystem.repositories.AccountRepository;
+import com.example.expensetrackingsystem.repositories.TransactionRepository;
 import com.example.expensetrackingsystem.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,14 @@ public class AccountService {
 
     private final UserRepository userRepository;
 
+    private final TransactionRepository transactionRepository;
+
     @Autowired
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository,
+                          TransactionRepository transactionRepository ) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Transactional
@@ -67,16 +72,21 @@ public class AccountService {
                 .toList();
     }
 
-    // TODO: implement this method
+
     @Transactional
-    public void deleteAccount(Account account) {
+    public void deleteAccount(int accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+
+        List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+        transactionRepository.deleteAll(transactions);
+
         accountRepository.delete(account);
     }
 
     // TODO: implement this method
     @Transactional
-    public void updateAccount(int accountId, AccountDTO accountdto) {
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+    public void updateAccount( AccountDTO accountdto) {
+        Account account = accountRepository.findById(accountdto.getId()).orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
         account.setAccountName(accountdto.getAccountName());
         account.setBalance(accountdto.getBalance());

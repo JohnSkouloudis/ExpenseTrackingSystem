@@ -58,7 +58,7 @@ public class AccountController {
         return ResponseEntity.ok(accounts);
     }
 
-    // Endpoint to create a transaction for an account
+
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createAccount( @RequestBody AccountDTO accountdto,@RequestHeader (value = "Authorization",required =false) String authHeader) {
@@ -72,12 +72,31 @@ public class AccountController {
         return ResponseEntity.ok("Account created successfully");
     }
 
+    @DeleteMapping("/delete/{accountId}")
+    public ResponseEntity<String> deleteAccount(@PathVariable int accountId,@RequestHeader (value = "Authorization",required =false) String authHeader) {
 
-    // TODO: implement update account
+        String token = authHeader.substring(7);
+        int userId = jwtService.extractUserId(token);
 
-    @PutMapping("/update/{accountId}")
-    public ResponseEntity<String> updateAccount(@PathVariable int accountId, @RequestBody AccountDTO accountdto) {
-        accountService.updateAccount(accountId, accountdto);
+
+        if (accountService.findByIdAndUser(accountId, userId) == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to delete this account");
+        }
+
+        accountService.deleteAccount(accountId);
+        return ResponseEntity.ok("Account deleted successfully");
+    }
+
+
+
+    @PutMapping("/update")
+    public ResponseEntity<String> updateAccount(@RequestBody AccountDTO accountdto,@RequestHeader (value = "Authorization",required =false) String authHeader) {
+        String token = authHeader.substring(7);
+        int userId = jwtService.extractUserId(token);
+        if (accountService.findByIdAndUser(accountdto.getId(), userId) == null || accountdto.getUserId() != userId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to update this account");
+        }
+        accountService.updateAccount(accountdto);
         return ResponseEntity.ok("Account updated successfully");
     }
 
