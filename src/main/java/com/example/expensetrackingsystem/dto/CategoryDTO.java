@@ -10,6 +10,6 @@ import lombok.Setter;
 public class CategoryDTO {
 
     private String name;
-    private long count;
+    private long amount;
 
 }

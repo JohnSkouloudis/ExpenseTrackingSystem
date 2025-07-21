@@ -11,7 +11,7 @@ import java.util.List;
 public class CategorySummaryDTO {
 
     private String type;
-    private long count;
+    private long amount;
 
     private List<CategoryDTO> subcategories;
 

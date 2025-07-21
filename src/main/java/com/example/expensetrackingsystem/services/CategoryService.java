@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -65,13 +66,13 @@ public class CategoryService {
             subcategories.add(parent);
 
             List<CategoryDTO> subcategoryDTOs = new ArrayList<>();
-            long subcategoriesTotalCount = 0;
+            long parentTotalAmount = 0;
 
             for (Category sub : subcategories) {
-                long subCount = transactionRepository.countByCategoryAndAccountIn(sub, accounts);
-                subcategoriesTotalCount += subCount;
-                if(subCount>0) {
-                    subcategoryDTOs.add(new CategoryDTO(sub.getCategoryName(), subCount));
+                Optional<Long> categoryTotalAmount = transactionRepository.sumAmountByCategoryAndAccountIn(sub, accounts);
+                if(categoryTotalAmount.isPresent()) {
+                    parentTotalAmount += categoryTotalAmount.get();
+                    subcategoryDTOs.add(new CategoryDTO(sub.getCategoryName(), categoryTotalAmount.get()));
                 }
             }
 
@@ -79,7 +80,7 @@ public class CategoryService {
 
             CategorySummaryDTO summary = new CategorySummaryDTO();
             summary.setType(parent.getCategoryName());
-            summary.setCount(subcategoriesTotalCount);
+            summary.setAmount(parentTotalAmount);
             summary.setSubcategories(subcategoryDTOs);
 
             summaries.add(summary);
