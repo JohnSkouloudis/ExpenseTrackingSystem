@@ -23,7 +23,7 @@ public class BudgetReset {
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void ResetExpiredBudgets() {
-        LocalDate now = LocalDate.of(2025, 6, 20);
+        LocalDate now =  LocalDate.now();
         System.out.println("Resetting expired budgets at " + now);
 
         List<Budget> budgets = budgetService.getBudgetsByEndDate(now);

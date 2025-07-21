@@ -4,7 +4,9 @@ import com.example.expensetrackingsystem.dto.AccountDTO;
 import com.example.expensetrackingsystem.dto.TransactionDTO;
 import com.example.expensetrackingsystem.dto.TransactionDetails;
 import com.example.expensetrackingsystem.dto.CategorySummaryDTO;
+import com.example.expensetrackingsystem.entities.ScheduledTransaction;
 import com.example.expensetrackingsystem.entities.Transaction;
+import com.example.expensetrackingsystem.entities.User;
 import com.example.expensetrackingsystem.services.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.opencsv.CSVWriter;
@@ -217,6 +219,58 @@ public class TransactionController {
         return categoryService.getCategorySummaries(userId);
 
 
+    }
+
+    // Endpoint to get all scheduled transactions for a user
+
+    @GetMapping("/scheduledTransactions/all")
+    public ResponseEntity<?> getScheduledTransactions(@RequestHeader(value = "Authorization",required =false) String authHeader){
+        String token = authHeader.substring(7);
+        int userId = jwtService.extractUserId(token);
+
+        if(!jwtService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        List<ScheduledTransaction> scheduledTransactions = transactionService.getScheduledTransactions(userId);
+        return ResponseEntity.ok(scheduledTransactions);
+    }
+
+    @PostMapping("/scheduledTransactions/add")
+    public ResponseEntity<?> addScheduledTransaction(@RequestBody ScheduledTransaction scheduledTransaction ,
+                                                     @RequestHeader(value = "Authorization",required =false) String authHeader ){
+        String token = authHeader.substring(7);
+        int userId = jwtService.extractUserId(token);
+
+        if(!jwtService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        if (accountService.findByIdAndUser(scheduledTransaction.getAccountId(), userId) == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
+        }
+
+
+        transactionService.saveScheduledTransaction(scheduledTransaction,userId);
+        return ResponseEntity.ok("Scheduled transaction added successfully");
+    }
+
+    @DeleteMapping("/scheduledTransactions/delete/{scheduledTransactionId}")
+    public ResponseEntity<?> deleteScheduledTransactions(@PathVariable int scheduledTransactionId ,
+                                                      @RequestHeader(value = "Authorization",required =false) String authHeader){
+        String token = authHeader.substring(7);
+        int userId = jwtService.extractUserId(token);
+
+        if(!jwtService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        if( transactionService.getScheduledTransactionByIdAndUserId(scheduledTransactionId, userId) == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access this resource");
+        }
+        transactionService.deleteScheduledTransaction(scheduledTransactionId);
+
+        return ResponseEntity.ok("Scheduled transaction deleted successfully");
     }
 
 
