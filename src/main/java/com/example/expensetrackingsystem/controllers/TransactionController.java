@@ -1,9 +1,6 @@
 package com.example.expensetrackingsystem.controllers;
 
-import com.example.expensetrackingsystem.dto.AccountDTO;
-import com.example.expensetrackingsystem.dto.TransactionDTO;
-import com.example.expensetrackingsystem.dto.TransactionDetails;
-import com.example.expensetrackingsystem.dto.CategorySummaryDTO;
+import com.example.expensetrackingsystem.dto.*;
 import com.example.expensetrackingsystem.entities.ScheduledTransaction;
 import com.example.expensetrackingsystem.entities.Transaction;
 import com.example.expensetrackingsystem.entities.User;
@@ -15,6 +12,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +31,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -239,8 +239,16 @@ public class TransactionController {
     @PostMapping("/scheduledTransactions/add")
     public ResponseEntity<?> addScheduledTransaction(@RequestBody ScheduledTransaction scheduledTransaction ,
                                                      @RequestHeader(value = "Authorization",required =false) String authHeader ){
+
+
+
         String token = authHeader.substring(7);
         int userId = jwtService.extractUserId(token);
+
+        if(transactionService.ScheduledTransactionCount(userId) >= 10) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can only have a maximum of 10 scheduled transactions");
+
+        }
 
         if(!jwtService.isTokenValid(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");

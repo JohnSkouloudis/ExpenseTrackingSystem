@@ -15,4 +15,5 @@ public interface ScheduledTransactionRepository extends JpaRepository<ScheduledT
  Optional<List<ScheduledTransaction>> findByUserId(int userId);
  List<ScheduledTransaction> findByExecutionDate(LocalDate executionDate);
  Optional<ScheduledTransaction> findByIdAndUserId(int id, int userId);
+ int countByUserId(int userId);
 }

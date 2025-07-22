@@ -2,6 +2,7 @@ package com.example.expensetrackingsystem.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,17 +23,24 @@ public class ScheduledTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+
     private String description;
+
 
     private float amount;
 
+
     private LocalDate createdDate;
+
 
     private int frequencyInDays;
 
+
     private LocalDate executionDate;
 
+
     private int accountId;
+
 
     private String categoryName;
 

@@ -61,8 +61,16 @@ public class TransactionService {
 
     }
 
+    public int  ScheduledTransactionCount(int userId) {
+
+        return  scheduledTransactionRepository.countByUserId(userId);
+
+
+    }
+
     @Transactional
     public void saveScheduledTransaction(ScheduledTransaction scheduledTransaction,int userId) {
+
 
         if (scheduledTransaction == null) {
             throw new IllegalArgumentException("Scheduled transaction cannot be null");
