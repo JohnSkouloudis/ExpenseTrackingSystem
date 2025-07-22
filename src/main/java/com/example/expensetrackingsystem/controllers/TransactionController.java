@@ -3,7 +3,6 @@ package com.example.expensetrackingsystem.controllers;
 import com.example.expensetrackingsystem.dto.*;
 import com.example.expensetrackingsystem.entities.ScheduledTransaction;
 import com.example.expensetrackingsystem.entities.Transaction;
-import com.example.expensetrackingsystem.entities.User;
 import com.example.expensetrackingsystem.services.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.opencsv.CSVWriter;
@@ -12,7 +11,6 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +20,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +28,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 
 @RestController
